@@ -7346,7 +7346,7 @@ components:
           type: string
         name:
           description: Name of the variable.
-          example: ''
+          example: VARIABLE_NAME
           type: string
         pattern:
           description: Pattern of the variable.
@@ -7483,6 +7483,33 @@ components:
       - GREATER_EQUALS
       - LOWER_EQUALS
       - MATCH_REGEX
+    SyntheticsConfigVariable:
+      description: Object defining a variable that can be used in your test configuration.
+      properties:
+        example:
+          description: Example for the variable.
+          type: string
+        name:
+          description: Name of the variable.
+          example: VARIABLE_NAME
+          type: string
+        pattern:
+          description: Pattern of the variable.
+          type: string
+        type:
+          $ref: '#/components/schemas/SyntheticsConfigVariableType'
+      required:
+      - example
+      - type
+      - name
+      type: object
+    SyntheticsConfigVariableType:
+      description: Type of the configuration variable.
+      enum:
+      - text
+      type: string
+      x-enum-varnames:
+      - TEXT
     SyntheticsDeleteTestsPayload:
       description: 'A JSON list of the ID or IDs of the Synthetic tests that you want
 
@@ -8027,10 +8054,15 @@ components:
           items:
             $ref: '#/components/schemas/SyntheticsAssertion'
           type: array
+        configVariables:
+          description: API tests only - array of variables used for the test.
+          items:
+            $ref: '#/components/schemas/SyntheticsConfigVariable'
+          type: array
         request:
           $ref: '#/components/schemas/SyntheticsTestRequest'
         variables:
-          description: Array of variables used for the test.
+          description: Browser tests only - array of variables used for the test steps.
           items:
             $ref: '#/components/schemas/SyntheticsBrowserVariable'
           type: array
@@ -20336,8 +20368,11 @@ tags:
   externalDocs:
     url: https://docs.datadoghq.com/integrations/azure
   name: Azure Integration
-- description: This endpoint is deprecated. Use the [new dashboard list endpoint](https://docs.datadoghq.com/api/v2/dashboard-lists/)
-    instead.
+- description: 'Interact with your dashboard lists through the API to
+
+    organize, find, and share all of your dashboards with your team and
+
+    organization.'
   name: Dashboard Lists
   x-deprecated: true
 - description: 'Interact with your dashboard lists through the API to make it easier
@@ -20373,26 +20408,20 @@ tags:
   name: Hosts
 - description: Get a list of IP prefixes belonging to Datadog.
   name: IP Ranges
-- description: '[Check API version 2](/api/v2/incident-services/).'
-  name: Incident Services
-- description: '[Check API version 2](/api/v2/incident-teams/).'
-  name: Incident Teams
-- description: '[Check API version 2](/api/v2/incidents/).'
-  name: Incidents
-- description: 'Manage your Datadog API and application keys.
+- description: 'Manage your Datadog API and application keys. You need an API key
+    and
 
+    an application key for a user with the required permissions to interact
 
-    You need an API and applications key with Admin rights
+    with these endpoints. The full list of API and application keys can be
 
-    to interact with this endpoint. The full list of keys can be seen on your
-
-    [Datadog API page](https://app.datadoghq.com/account/settings#api).'
+    seen on your [Datadog API page](https://app.datadoghq.com/account/settings#api).'
   externalDocs:
     description: Find out more at
     url: https://docs.datadoghq.com/account_management/api-app-keys/
   name: Key Management
-- description: 'Send your logs to your Datadog platform over HTTP. Limits per HTTP
-    request are:
+- description: 'Search your logs and send them to your Datadog platform over HTTP.
+    Limits per HTTP request are:
 
 
     - Maximum content size per payload: 5MB
@@ -20410,13 +20439,11 @@ tags:
     than 256KB, and returns a 2xx.
 
 
-    We encourage you to send your logs compressed.
+    Datadog recommends sending your logs compressed.
 
     Add the `Content-Encoding: gzip` header to the request when sending compressed
     logs.'
   name: Logs
-- description: '[Check API version 2](/api/v2/logs-archives/).'
-  name: Logs Archives
 - description: 'Manage configuration of [log indexes](https://docs.datadoghq.com/logs/indexes/).
 
     You need an API and application key with Admin rights to interact with this endpoint.'
@@ -20424,8 +20451,6 @@ tags:
     description: Find out more at
     url: https://docs.datadoghq.com/logs/indexes/
   name: Logs Indexes
-- description: '[Check API version 2](/api/v2/logs-metrics/).'
-  name: Logs Metrics
 - description: "Pipelines and processors operate on incoming logs, parsing\nand transforming\
     \ them into structured attributes for easier querying.\n\n- See the [pipelines\
     \ configuration page](https://app.datadoghq.com/logs/pipelines)\n  for a list\
@@ -20444,8 +20469,6 @@ tags:
     description: Find out more at
     url: https://docs.datadoghq.com/logs/processing/
   name: Logs Pipelines
-- description: '[Check API version 2](/api/v2/logs-restriction-queries/).'
-  name: Logs Restriction Queries
 - description: "The metrics endpoint allows you to:\n\n- Post metrics data so it can\
     \ be graphed on Datadog\u2019s dashboards\n- Query metrics from any time period\n\
     \n**Note**: A graph can only contain a set number of points\nand as the timeframe\
@@ -20476,10 +20499,6 @@ tags:
   externalDocs:
     url: https://docs.datadoghq.com/api/?lang=bash#integration-pagerduty
   name: PagerDuty Integration
-- description: '[Check API version 2](/api/v2/processes/).'
-  name: Processes
-- description: '[Check API version 2](/api/v2/roles/).'
-  name: Roles
 - description: This endpoint is outdated. Use the [new Dashboard endpoint](https://docs.datadoghq.com/api/#dashboards)
     instead.
   externalDocs:
@@ -20487,8 +20506,6 @@ tags:
     url: https://docs.datadoghq.com/dashboards/guide/screenboard-api-doc/
   name: Screenboards
   x-deprecated: true
-- description: '[Check API version 2](/api/v2/security-monitoring/).'
-  name: Security Monitoring
 - description: 'The service check endpoint allows you to post check statuses for use
     with monitors.
 
@@ -20606,10 +20623,9 @@ tags:
     description: Find out more at
     url: https://docs.datadoghq.com/account_management/billing/usage_details/
   name: Usage Metering
-- description: 'Create, edit, and disable users. [Read more about team management][1].
-
-
-    [1]: https://docs.datadoghq.com/account_management/team'
+- description: Create, edit, and disable users.
+  externalDocs:
+    url: https://docs.datadoghq.com/account_management/users
   name: Users
 - description: 'Configure your Datadog-Webhooks integration directly through the Datadog
     API.
